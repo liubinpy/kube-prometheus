@@ -1,0 +1,40 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  labels:
+    app: nacos-sm
+  name: nacos
+  namespace: monitoring
+spec:
+  endpoints:
+  - interval: 15s
+    path: /nacos/actuator/prometheus
+    port: http-metrics
+    scheme: http
+    tlsConfig:
+      insecureSkipVerify: true
+  jobLabel: app
+  namespaceSelector:
+    matchNames:
+    - public-service-env-qa
+  selector:
+    matchLabels:
+      app: nacos-sm
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: nacos-sm
+  name: nacos
+  namespace: public-service-env-qa
+spec:
+  ports:
+  - name: http-metrics
+    port: 8848
+    protocol: TCP
+    targetPort: 8848
+  selector:
+    app: nacos
+  sessionAffinity: None
+  type: ClusterIP

@@ -1,0 +1,43 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  labels:
+    app: spring-boot
+  name: spring-boot
+  namespace: monitoring
+spec:
+  podMetricsEndpoints:
+  - interval: 15s
+    relabelings:
+    - action: keep
+      sourceLabels: 
+      - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+      regex: "true"
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_pod_annotation_prometheus_io_path
+      targetLabel: __metrics_path__
+      regex: (.+)
+    - action: replace
+      sourceLabels:
+      - __address__
+      - __meta_kubernetes_pod_annotation_prometheus_io_port
+      targetLabel: __address__
+      regex: ([^:]+)(?::\d+)?;(\d+)
+      replacement: $1:$2
+    - action: labelmap
+      regex: __meta_kubernetes_pod_label_(.+)
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_namespace
+      targetLabel: kubernetes_namespace
+    - action: replace
+      sourceLabels:
+      - __meta_kubernetes_pod_name
+      targetLabel: kubernetes_pod_name
+  namespaceSelector:   # 选择要监控pod所在的namespace
+    matchNames:
+    - koderover-dev-open-store
+  selector:    # 填写要监控pod的Label值，以定位目标pod
+    matchLabels:
+      s-product: open-store

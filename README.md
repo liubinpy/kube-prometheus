@@ -11,7 +11,19 @@
 - grafana (7.5.4)
 - blackbox-exporter (v0.18.0)
 
-版本测试说明：基本兼容kubernetes 1.16+
+## 版本说明
+版本说明：基于kube-prometheus release-0.8分支，修改了以下内容：
+删除了coredns的监控，添加了kube-dns的监控
+修改了kube-controller-manager的servicemonitor，添加了controller-manager的service，修改了kube-controller-manager的dashboard
+修改了kube-scheduler的servicemonitor，添加了kube-scheduler的service
+添加了grafan的持久化(PVC)和prometheus的持久化(StorageClass)
+修改了镜像仓库地址，添加了imagePullSecrets
+修改了qa和dev环境的grafana、prometheus的副本数为1，生产环境建议设置为3
+添加了nacos的监控和dashboard
+添加了springboot的监控，基于kuberntes的服务发现
+添加了对名称空间koderover-dev-open-store、public-service-env-qa的rbac权限（需要配置其他名称空间的rbac权限，可参考README）2021-5-8 
+添加对nginx-controller的监控和dashboard 2021-5-10 
+修改了promethues的数据保留时间为30d 2021-5-20
 
 ## 配置
 ### 持久化

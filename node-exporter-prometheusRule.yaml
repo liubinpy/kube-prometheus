@@ -14,12 +14,12 @@ spec:
   groups:
   - name: node-exporter
     rules:
-    - alert: NodeFilesystemSpaceFillingUp
+    - alert: NodeFilesystemSpaceFillingUp # 节点磁盘要满了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left and is filling up.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemspacefillingup
-        summary: Filesystem is predicted to run out of space within the next 24 hours.
-      expr: |
+        summary: Filesystem is predicted to run out of space within the next 24 hours. # 文件系统预计将在未来24小时内耗尽
+      expr: | # 剩余磁盘使用率小于40% and 根据最近6h磁盘的使用曲线变化速率，24小时后节点的可用字节将小于0  and 文件系统不是只读的(为0)
         (
           node_filesystem_avail_bytes{job="node-exporter",fstype!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!=""} * 100 < 40
         and
@@ -27,15 +27,15 @@ spec:
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: warning
-    - alert: NodeFilesystemSpaceFillingUp
+        severity: warning  # 警告
+    - alert: NodeFilesystemSpaceFillingUp # 节点磁盘要满了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left and is filling up fast.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemspacefillingup
-        summary: Filesystem is predicted to run out of space within the next 4 hours.
-      expr: |
+        summary: Filesystem is predicted to run out of space within the next 4 hours. # 文件系统预计将在未来4小时内耗尽
+      expr: | # 剩余磁盘使用率小于15% 且 根据最近6h磁盘的使用曲线变化速率，4小时后节点的可用字节将小于0  且 文件系统不是只读的(为0)
         (
           node_filesystem_avail_bytes{job="node-exporter",fstype!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!=""} * 100 < 15
         and
@@ -43,43 +43,43 @@ spec:
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: critical
-    - alert: NodeFilesystemAlmostOutOfSpace
+        severity: critical # 严重
+    - alert: NodeFilesystemAlmostOutOfSpace # 节点文件系统快没有空间了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemalmostoutofspace
-        summary: Filesystem has less than 5% space left.
-      expr: |
+        summary: Filesystem has less than 5% space left. # 文件系统空间小与5%
+      expr: | # 剩余磁盘空间小与5% 且 文件系统不是只读的(为0)
         (
           node_filesystem_avail_bytes{job="node-exporter",fstype!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!=""} * 100 < 5
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: warning
-    - alert: NodeFilesystemAlmostOutOfSpace
+        severity: warning # 警告
+    - alert: NodeFilesystemAlmostOutOfSpace # 节点文件系统快没有空间了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available space left.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemalmostoutofspace
-        summary: Filesystem has less than 3% space left.
-      expr: |
+        summary: Filesystem has less than 3% space left. # 文件系统空间小与3%
+      expr: | # 剩余磁盘空间小与3% 且 文件系统不是只读的(为0)
         (
           node_filesystem_avail_bytes{job="node-exporter",fstype!=""} / node_filesystem_size_bytes{job="node-exporter",fstype!=""} * 100 < 3
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: critical
-    - alert: NodeFilesystemFilesFillingUp
+        severity: critical # 严重
+    - alert: NodeFilesystemFilesFillingUp # 文件系统inode快满了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available inodes left and is filling up.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemfilesfillingup
-        summary: Filesystem is predicted to run out of inodes within the next 24 hours.
-      expr: |
+        summary: Filesystem is predicted to run out of inodes within the next 24 hours. # 文件系统的inode将在24小时之后用尽
+      expr: | # 文件系统的空闲的inodes小与40% 且 根据6小时inode的使用曲线变化速率，在24小时后，inode将用尽 且 文件系统不是只读的(为0)
         (
           node_filesystem_files_free{job="node-exporter",fstype!=""} / node_filesystem_files{job="node-exporter",fstype!=""} * 100 < 40
         and
@@ -87,15 +87,15 @@ spec:
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: warning
-    - alert: NodeFilesystemFilesFillingUp
+        severity: warning # 警告
+    - alert: NodeFilesystemFilesFillingUp # 文件系统inode快满了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available inodes left and is filling up fast.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemfilesfillingup
-        summary: Filesystem is predicted to run out of inodes within the next 4 hours.
-      expr: |
+        summary: Filesystem is predicted to run out of inodes within the next 4 hours. # 文件系统的inode将在4小时之后用尽
+      expr: | # 文件系统的空闲的inodes小与20% 且 根据6小时inode的使用曲线变化速率，在4小时后，inode将用尽 且 文件系统不是只读的(为0)
         (
           node_filesystem_files_free{job="node-exporter",fstype!=""} / node_filesystem_files{job="node-exporter",fstype!=""} * 100 < 20
         and
@@ -106,78 +106,78 @@ spec:
       for: 1h
       labels:
         severity: critical
-    - alert: NodeFilesystemAlmostOutOfFiles
+    - alert: NodeFilesystemAlmostOutOfFiles # 节点inodes的快用尽了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available inodes left.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemalmostoutoffiles
-        summary: Filesystem has less than 5% inodes left.
-      expr: |
+        summary: Filesystem has less than 5% inodes left. # 文件系统的inode少于5%了
+      expr: | # 文件系统的空闲inode数小于5% 且 文件系统不是只读的(为0)
         (
           node_filesystem_files_free{job="node-exporter",fstype!=""} / node_filesystem_files{job="node-exporter",fstype!=""} * 100 < 5
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: warning
-    - alert: NodeFilesystemAlmostOutOfFiles
+        severity: warning # 警告 
+    - alert: NodeFilesystemAlmostOutOfFiles  # 节点inodes的快用尽了
       annotations:
         description: Filesystem on {{ $labels.device }} at {{ $labels.instance }} has only {{ printf "%.2f" $value }}% available inodes left.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodefilesystemalmostoutoffiles
-        summary: Filesystem has less than 3% inodes left.
-      expr: |
+        summary: Filesystem has less than 3% inodes left. # 文件系统的inode少于3%了
+      expr: | # 文件系统的空闲inode数小于3% 且 文件系统不是只读的(为0)
         (
           node_filesystem_files_free{job="node-exporter",fstype!=""} / node_filesystem_files{job="node-exporter",fstype!=""} * 100 < 3
         and
           node_filesystem_readonly{job="node-exporter",fstype!=""} == 0
         )
-      for: 1h
+      for: 1h # 一个小时评估一次
       labels:
-        severity: critical
-    - alert: NodeNetworkReceiveErrs
+        severity: critical # 严重
+    - alert: NodeNetworkReceiveErrs # 网络错误
       annotations:
         description: '{{ $labels.instance }} interface {{ $labels.device }} has encountered {{ printf "%.0f" $value }} receive errors in the last two minutes.'
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodenetworkreceiveerrs
-        summary: Network interface is reporting many receive errors.
-      expr: |
+        summary: Network interface is reporting many receive errors. # 网络接口报告了许多接收错误
+      expr: | # 2分钟内平均每秒接受到错误包的增长速率 / 2分钟内平均每秒接受到总包的增长速率 大于 0.01，也就是说在两分钟内错误packets占比总packets的数量大于0.01，就会报警
         rate(node_network_receive_errs_total[2m]) / rate(node_network_receive_packets_total[2m]) > 0.01
-      for: 1h
+      for: 1h # 一个小时评估一次 
       labels:
-        severity: warning
-    - alert: NodeNetworkTransmitErrs
+        severity: warning # 警告
+    - alert: NodeNetworkTransmitErrs  # 节点网络传输错误
       annotations:
         description: '{{ $labels.instance }} interface {{ $labels.device }} has encountered {{ printf "%.0f" $value }} transmit errors in the last two minutes.'
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodenetworktransmiterrs
-        summary: Network interface is reporting many transmit errors.
-      expr: |
+        summary: Network interface is reporting many transmit errors. # 网络接口报告了很多传输错误
+      expr: | # 2分钟内平均每秒网络传输错误增长速率 / 2分钟内平均每秒传输增长速率  > 0.01，也就是说当在两分钟内，网络传输的错误packets占总传输packets的0.01，就会报警
         rate(node_network_transmit_errs_total[2m]) / rate(node_network_transmit_packets_total[2m]) > 0.01
       for: 1h
       labels:
-        severity: warning
-    - alert: NodeHighNumberConntrackEntriesUsed
+        severity: warning  # 警告
+    - alert: NodeHighNumberConntrackEntriesUsed # 节点contrack条目数量快用尽了 # 注意没有加for的，默认时间等于evaluation_interval为1分钟
       annotations:
         description: '{{ $value | humanizePercentage }} of conntrack entries are used.'
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodehighnumberconntrackentriesused
-        summary: Number of conntrack are getting close to the limit.
-      expr: |
+        summary: Number of conntrack are getting close to the limit. # contrack条目已经接近极限了
+      expr: | # 节点已经使用的contrack条目数 / 节点contrack条目的limit > 0.75，也就是说当contrak条目使用率大于75
         (node_nf_conntrack_entries / node_nf_conntrack_entries_limit) > 0.75
       labels:
-        severity: warning
-    - alert: NodeTextFileCollectorScrapeError
+        severity: warning # 警告
+    - alert: NodeTextFileCollectorScrapeError  # Node Exporter textfile 刮擦错误 #  textfile collector用于采集服务器上指定目录下，prom格式的指标数据
       annotations:
         description: Node Exporter text file collector failed to scrape.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodetextfilecollectorscrapeerror
-        summary: Node Exporter text file collector failed to scrape.
-      expr: |
+        summary: Node Exporter text file collector failed to scrape. node_exporter textfile 刮擦失败
+      expr: | # textfile collector 刮擦 error
         node_textfile_scrape_error{job="node-exporter"} == 1
       labels:
-        severity: warning
-    - alert: NodeClockSkewDetected
+        severity: warning # 警告
+    - alert: NodeClockSkewDetected # 节点时钟偏移
       annotations:
-        description: Clock on {{ $labels.instance }} is out of sync by more than 300s. Ensure NTP is configured correctly on this host.
+        description: Clock on {{ $labels.instance }} is out of sync by more than 0.05s. Ensure NTP is configured correctly on this host.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodeclockskewdetected
-        summary: Clock skew detected.
-      expr: |
+        summary: Clock skew detected. # 检测到节点时钟偏移 
+      expr: | # ( 时间偏差大于0.05秒 且 最近5分钟的时间偏差的二阶导数大于零 ）或者 （ 时间偏差大于0.05秒 且 最近5分钟的时间偏差的二阶导数小于零 ）
         (
           node_timex_offset_seconds > 0.05
         and
@@ -189,41 +189,41 @@ spec:
         and
           deriv(node_timex_offset_seconds[5m]) <= 0
         )
-      for: 10m
+      for: 10m # 10分钟评估一次
       labels:
-        severity: warning
-    - alert: NodeClockNotSynchronising
+        severity: warning # 警告
+    - alert: NodeClockNotSynchronising # 节点时钟不同步
       annotations:
         description: Clock on {{ $labels.instance }} is not synchronising. Ensure NTP is configured on this host.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/nodeclocknotsynchronising
-        summary: Clock not synchronising.
-      expr: |
+        summary: Clock not synchronising. # 时钟不同步
+      expr: | # 5分钟内最小的值等于0 且  最大误差秒杀大于16秒
         min_over_time(node_timex_sync_status[5m]) == 0
         and
         node_timex_maxerror_seconds >= 16
-      for: 10m
+      for: 10m # 10分钟评估一次
       labels:
         severity: warning
-    - alert: NodeRAIDDegraded
+    - alert: NodeRAIDDegraded # 节点的raid状态为Degraded 
       annotations:
         description: RAID array '{{ $labels.device }}' on {{ $labels.instance }} is in degraded state due to one or more disks failures. Number of spare drives is insufficient to fix issue automatically.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/noderaiddegraded
-        summary: RAID Array is degraded
+        summary: RAID Array is degraded # raid矩阵 的状态为 degraded
       expr: |
         node_md_disks_required - ignoring (state) (node_md_disks{state="active"}) > 0
-      for: 15m
+      for: 15m # 15分钟评估一次
       labels:
         severity: critical
-    - alert: NodeRAIDDiskFailure
+    - alert: NodeRAIDDiskFailure # raid中磁盘故障
       annotations:
         description: At least one device in RAID array on {{ $labels.instance }} failed. Array '{{ $labels.device }}' needs attention and possibly a disk swap.
         runbook_url: https://github.com/prometheus-operator/kube-prometheus/wiki/noderaiddiskfailure
-        summary: Failed device in RAID array
-      expr: |
+        summary: Failed device in RAID array # raid矩阵中存在坏盘
+      expr: | # 坏盘数量大与0
         node_md_disks{state="failed"} > 0
       labels:
-        severity: warning
-  - name: node-exporter.rules
+        severity: warning   # 以下都是记录规则，不用于报警，生成新的指标存储在prometheus中
+  - name: node-exporter.rules  
     rules:
     - expr: |
         count without (cpu) (
@@ -231,52 +231,52 @@ spec:
             node_cpu_seconds_total{job="node-exporter"}
           )
         )
-      record: instance:node_num_cpu:sum
+      record: instance:node_num_cpu:sum # cpu的数量
     - expr: |
         1 - avg without (cpu, mode) (
           rate(node_cpu_seconds_total{job="node-exporter", mode="idle"}[5m])
         )
-      record: instance:node_cpu_utilisation:rate5m
+      record: instance:node_cpu_utilisation:rate5m # 平均5分钟的cpu的利用率
     - expr: |
         (
           node_load1{job="node-exporter"}
         /
           instance:node_num_cpu:sum{job="node-exporter"}
         )
-      record: instance:node_load1_per_cpu:ratio
+      record: instance:node_load1_per_cpu:ratio # 1分钟的cpu使用负载
     - expr: |
         1 - (
           node_memory_MemAvailable_bytes{job="node-exporter"}
         /
           node_memory_MemTotal_bytes{job="node-exporter"}
         )
-      record: instance:node_memory_utilisation:ratio
+      record: instance:node_memory_utilisation:ratio # 内存使用率
     - expr: |
-        rate(node_vmstat_pgmajfault{job="node-exporter"}[5m])
-      record: instance:node_vmstat_pgmajfault:rate5m
+        rate(node_vmstat_pgmajfault{job="node-exporter"}[5m]) 
+      record: instance:node_vmstat_pgmajfault:rate5m # 二级页面每秒产生的错误数
     - expr: |
         rate(node_disk_io_time_seconds_total{job="node-exporter", device=~"mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|dasd.+"}[5m])
-      record: instance_device:node_disk_io_time_seconds:rate5m
+      record: instance_device:node_disk_io_time_seconds:rate5m # 5分钟内，每秒io所花的时间
     - expr: |
         rate(node_disk_io_time_weighted_seconds_total{job="node-exporter", device=~"mmcblk.p.+|nvme.+|rbd.+|sd.+|vd.+|xvd.+|dm-.+|dasd.+"}[5m])
-      record: instance_device:node_disk_io_time_weighted_seconds:rate5m
+      record: instance_device:node_disk_io_time_weighted_seconds:rate5m # 5分钟内，每秒io所花的加权秒数
     - expr: |
         sum without (device) (
           rate(node_network_receive_bytes_total{job="node-exporter", device!="lo"}[5m])
         )
-      record: instance:node_network_receive_bytes_excluding_lo:rate5m
+      record: instance:node_network_receive_bytes_excluding_lo:rate5m # 5分钟内，每秒接收到的bytes数量，不包括lo口
     - expr: |
         sum without (device) (
           rate(node_network_transmit_bytes_total{job="node-exporter", device!="lo"}[5m])
         )
-      record: instance:node_network_transmit_bytes_excluding_lo:rate5m
+      record: instance:node_network_transmit_bytes_excluding_lo:rate5m # 5分钟内，每秒传输的bytes数量，不包括lo口
     - expr: |
         sum without (device) (
           rate(node_network_receive_drop_total{job="node-exporter", device!="lo"}[5m])
         )
-      record: instance:node_network_receive_drop_excluding_lo:rate5m
+      record: instance:node_network_receive_drop_excluding_lo:rate5m # 5分钟内，每秒接受丢弃报文数量
     - expr: |
         sum without (device) (
           rate(node_network_transmit_drop_total{job="node-exporter", device!="lo"}[5m])
         )
-      record: instance:node_network_transmit_drop_excluding_lo:rate5m
+      record: instance:node_network_transmit_drop_excluding_lo:rate5m # 5分钟内，每秒传输数据，丢弃的报文数量
